@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>كشف رحلات النقل</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#12408a">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#eef1f6;--paper:#fff;--ink:#1b2433;--mute:#5a6578;--navy:#12408a;--band:#eef3fb;--line:#d6dce8;--ctl:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10151f;--paper:#1a2231;--ink:#e8edf6;--mute:#9aa6bb;--navy:#5b8dde;--band:#202b3f;--line:#33405a;--ctl:#222c40}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,"Noto Naskh Arabic",Arial,sans-serif;font-size:15px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 12px;background:var(--paper);border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+.bar button,.bar select,.bar input{font:inherit;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--ctl);color:var(--ink)}
+.bar button{cursor:pointer}
+.bar .main{background:var(--navy);color:#fff;border-color:var(--navy)}
+.bar input[type=text]{width:130px}
+.wrap{max-width:900px;margin:14px auto;padding:0 10px}
+.paper{background:var(--paper);padding:22px;border-radius:6px;border:1px solid var(--line)}
+.head{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:3px double var(--navy);padding-bottom:12px;margin-bottom:14px}
+.head img{max-height:90px;max-width:100%}
+.head .box{flex:1}
+.head h2{margin:0;color:var(--navy);font-size:20px}
+.head p{margin:2px 0;color:var(--mute);font-size:13px}
+.en{direction:ltr;text-align:left}
+.meta{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;margin:8px 0 10px}
+.meta h3{margin:0;color:var(--navy);font-size:19px}
+input.cell{width:100%;border:0;background:transparent;color:inherit;font:inherit;padding:6px 4px;text-align:center}
+input.cell:focus,.bar input:focus{outline:2px solid var(--navy);outline-offset:-2px}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:640px}
+th{background:var(--navy);color:#fff;padding:8px 4px;font-size:13px}
+td{border:1px solid var(--line);padding:0}
+tr:nth-child(even) td{background:var(--band)}
+td.n{width:34px;text-align:center}td.amt{font-weight:700;text-align:center;padding:6px 4px}
+td.x{width:34px;border:0;background:transparent!important}
+.x button{border:0;background:none;color:#c0392b;font-size:18px;cursor:pointer}
+tfoot td{background:var(--band)!important;font-weight:700;border-top:2px solid var(--navy);padding:10px;color:var(--navy)}
+.foot{margin-top:18px;font-weight:700}
+.sign{margin-top:36px;width:200px;border-top:1px solid var(--ink);padding-top:3px;font-size:12px;color:var(--mute)}
+#msg{font-size:13px;color:var(--mute)}
+@media print{
+ :root{padding:0}
+ body{background:#fff;color:#000}
+ .bar,.x,#addrow{display:none!important}
+ .wrap{margin:0;padding:0;max-width:none}
+ .paper{border:0;padding:0;background:#fff}
+ :root{--paper:#fff;--ink:#000;--navy:#12408a;--band:#eef3fb;--line:#c9d0de;--mute:#444}
+ th{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ tr:nth-child(even) td,tfoot td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ .tw{overflow:visible}
+ @page{size:A4;margin:12mm}
+}
+</style>
+</head>
+<body>
+<div class="bar">
+  <button class="main" onclick="window.print()">طباعة / حفظ PDF</button>
+  <button onclick="addRow()" id="addrow">+ رحلة</button>
+  <input type="text" id="rname" placeholder="اسم الكشف (مثال 2026-10)" aria-label="اسم الكشف">
+  <button onclick="save()">حفظ</button>
+  <select id="saved" onchange="load(this.value)" aria-label="الكشوف المحفوظة"><option value="">الكشوف المحفوظة</option></select>
+  <button onclick="newMonth()">شهر جديد</button>
+  <label style="font-size:13px">الشعار <input type="file" accept="image/*" id="logo" style="max-width:150px"></label>
+  <span id="msg"></span>
+</div>
+<div class="wrap"><div class="paper">
+  <div class="head">
+    <div class="box en"><h2 style="direction:ltr">Adel Fahad Al Tamimi Est.</h2><p>General Contracting &amp; Equipment Rental</p><p>C.R:3357010994</p></div>
+    <img id="logoimg" alt="" hidden>
+    <div class="box"><h2>مؤسسة عادل فهد التميمي</h2><p>للمقاولات العامة وتأجير المعدات</p><p>س.ت: ٣٣٥٧٠١٠٩٩٤</p></div>
+  </div>
+  <div style="font-weight:700"><input class="cell" id="client" style="text-align:right;font-weight:700" value="السادة / مصنع الوطنية الغربية للمنتجات الأسمنتية"></div>
+  <div style="color:var(--mute);font-size:13px;padding:0 4px">السلام عليكم ورحمة الله وبركاته</div>
+  <div class="meta"><h3>كشف رحلات النقل</h3><div class="en" style="font-size:13px;color:var(--mute)">Date: <input class="cell" id="date" style="width:110px;display:inline-block;text-align:left" inputmode="numeric"></div></div>
+  <div class="tw"><table>
+    <thead><tr><th>م</th><th>التاريخ</th><th>رقم الشعار</th><th>الموقع</th><th>السائق</th><th>تفصيل السعر</th><th>المبلغ (ريال)</th><th class="x" style="background:none"></th></tr></thead>
+    <tbody id="rows"></tbody>
+    <tfoot><tr><td colspan="6">المجموع الكلي</td><td id="total" style="text-align:center">0 ريال</td><td class="x"></td></tr></tfoot>
+  </table></div>
+  <div class="foot">مع خالص الشكر والتقدير</div>
+  <div class="sign">الختم والتوقيع</div>
+</div></div>
+<script>
+var S0=[["29/9/26","07276","تبوك","رحيم جان","5500"],["30/9/26","07277","عرعر","أمان الله","6000"],["30/9/26","07278","شرما أكساجون","إسلام","4400 + 1000 + 500"],["1/10/26","07279","شرما + تبوك","سدرجان","5500 + 1000"],["5/10/26","07281","شرما","أمان الله","5500"],["6/10/26","07282","العلا","إسلام","4400"],["10/10/26","07286","جزان","اختر شاه","3900"],["12/10/26","07287","العلا","إسلام","4400"],["11/10/26","07285","عرعر","نور محمد","6000"],["18/10/26","07288","طريف","أمان الله","6000"],["19/10/26","07289","شرما","اختر شاه","500 + 5500"],["22/10/26","07291","شرما + شيخ حميد","قرار الله","500 + 5500"],["31/10/26","07295","عرعر","أمان الله","6000"],["27/10/26","07293","طريف","رحيم جان","6000"]];
+var rowsEl=document.getElementById("rows"),logo="";
+function sum(s){var t=0;String(s).replace(/[٠-٩]/g,function(d){return d.charCodeAt(0)-1632}).split("+").forEach(function(p){var n=parseFloat(p.replace(/[^\d.]/g,""));if(!isNaN(n))t+=n});return t}
+function fmt(n){return n.toLocaleString("en-US")}
+function addRow(r){r=r||["","","","",""];var tr=document.createElement("tr");
+ tr.innerHTML='<td class="n"></td>'+[0,1,2,3,4].map(function(i){return '<td><input class="cell" value="'+r[i].replace(/"/g,"&quot;")+'"></td>'}).join("")+'<td class="amt"></td><td class="x"><button title="حذف" aria-label="حذف الرحلة">×</button></td>';
+ tr.querySelector("button").onclick=function(){tr.remove();calc()};
+ tr.addEventListener("input",calc);rowsEl.appendChild(tr);calc()}
+function calc(){var t=0;[].forEach.call(rowsEl.children,function(tr,i){tr.children[0].textContent=i+1;var a=sum(tr.children[5].firstChild.value);tr.querySelector(".amt").textContent=a?fmt(a):"";t+=a});document.getElementById("total").textContent=fmt(t)+" ريال"}
+function data(){return{client:v("client"),date:v("date"),logo:logo,rows:[].map.call(rowsEl.children,function(tr){return[1,2,3,4,5].map(function(i){return tr.children[i].firstChild.value})})}}
+function v(id){return document.getElementById(id).value}
+function fill(d){document.getElementById("client").value=d.client;document.getElementById("date").value=d.date;setLogo(d.logo||"");rowsEl.innerHTML="";d.rows.forEach(addRow);calc()}
+function setLogo(u){logo=u;var im=document.getElementById("logoimg");im.hidden=!u;if(u)im.src=u}
+function today(){var d=new Date();return d.getDate().toString().padStart(2,"0")+"-"+(d.getMonth()+1).toString().padStart(2,"0")+"-"+d.getFullYear()}
+function say(t){var m=document.getElementById("msg");m.textContent=t;setTimeout(function(){m.textContent=""},2500)}
+function list(){var s=document.getElementById("saved");s.length=1;try{Object.keys(localStorage).filter(function(k){return k.indexOf("trip:")==0}).sort().forEach(function(k){var o=new Option(k.slice(5),k);s.add(o)})}catch(e){}}
+function save(){var n=v("rname").trim();if(!n){say("اكتب اسم الكشف أولاً");return}try{localStorage.setItem("trip:"+n,JSON.stringify(data()));list();say("تم الحفظ")}catch(e){say("تعذر الحفظ في هذا المتصفح")}}
+function load(k){if(!k)return;try{fill(JSON.parse(localStorage.getItem(k)));document.getElementById("rname").value=k.slice(5)}catch(e){say("تعذر فتح الكشف")}}
+function newMonth(){var d=data();d.rows=[];d.date=today();fill(d);addRow();document.getElementById("rname").value=""}
+document.getElementById("logo").onchange=function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){setLogo(r.result)};r.readAsDataURL(f)};
+fill({client:"السادة / مصنع الوطنية الغربية للمنتجات الأسمنتية",date:"14-11-2026",rows:S0});list();
+if("serviceWorker"in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}
+</script>
+</body>
+</html>
